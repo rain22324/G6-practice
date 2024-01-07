@@ -149,7 +149,7 @@ export default {
     const container = document.getElementById('app');
     const width = container.offsetWidth;
     const height = container.offsetHeight || 500;
-    graph = new G6.Graph({
+    const G6Config = {
       container: container,
       width,
       height,
@@ -158,7 +158,7 @@ export default {
           {
             type: 'scroll-canvas',
             direction: 'y',
-            scalableRange: -200,
+            scalableRange: -70,
             allowDragOnItem: true,
           },
         ],
@@ -169,8 +169,8 @@ export default {
         align: 'UL',
         controlPoints: true,
         nodesep: 10, // 可选
-        ranksep: 100, // 可选
-        // nodesepFunc: () => 1,
+        ranksep: (width-1000)/13, // 可选
+        // nodesepFunc: () => 10,
         // ranksepFunc: () => 1,
       },
       defaultNode: {
@@ -193,7 +193,9 @@ export default {
           radius: 20,
         }
       },
-    });
+    }
+
+    graph = new G6.Graph(G6Config);
 
     const data = {
       nodes: [
@@ -212,22 +214,28 @@ export default {
         {
           id: 'd',
           name: 'cardNodeAppd',
+        },
+        {
+          id: 'e',
+          name: 'cardNodeAppe',
         }
       ],
       edges: [
         {
           source: 'a',
           target: 'b',
-          color: 'l(0) 0:#ffffff 0.5:#7ec2f3 1:#1890ff',
         },
         {
           source: 'b',
           target: 'c',
-          color: 'l(0) 0:#ffffff 0.5:#7ec2f3 1:#1890ff',
         },
         {
-          source: 'a',
+          source: 'c',
           target: 'd'
+        },
+        {
+          source: 'c',
+          target: 'e'
         }
       ],
     };
@@ -240,7 +248,6 @@ export default {
         if (!graph || graph.get('destroyed')) return;
         if (!container || !container.offsetWidth || !container.offsetHeight) return;
         graph.changeSize(container.offsetWidth, container.offsetHeight);
-        graph.render();
       };
   }
 }
