@@ -39,17 +39,59 @@ export default {
         /* 矩形 */
         group.addShape('rect', {
           attrs: {
-            x: 3,
+            x: 0,
             y: 0,
-            width: w - 19,
+            width: w,
             height: h,
             fill: config.bgColor,
             stroke: config.borderColor,
-            radius: 2,
+            lineWidth: 2,
+            radius: 8,
             cursor: 'pointer',
           },
           // must be assigned in G6 3.3 and later versions. it can be any string you want, but should be unique in a custom item type
           name: 'rect-shape',
+        });
+
+        return container;
+      }
+    };
+
+    G6.registerNode('card-node', {
+      draw: (cfg, group) => {
+        const config = getNodeConfig(cfg);
+        /* the biggest rect */
+        const container = nodeBasicMethod.createNodeBox(group, config, 250, 50);
+        
+        group.addShape('image', {
+          attrs: {
+            x: 20,
+            y: 13,
+            height: 12,
+            width: 10,
+            img: 'https://os.alipayobjects.com/rmsportal/DFhnQEhHyPjSGYW.png',
+            cursor: 'pointer',
+            opacity: 0,
+          },
+          // must be assigned in G6 3.3 and later versions. it can be any string you want, but should be unique in a custom item type
+          name: 'ip-cp-icon',
+        });
+
+        /* name */
+        group.addShape('text', {
+          attrs: {
+            text: cfg.name,
+            x: 120,
+            y: 25,
+            fontSize: 14,
+            fontWeight: 700,
+            textAlign: 'center',
+            textBaseline: 'middle',
+            fill: config.fontColor,
+          },
+          // must be assigned in G6 3.3 and later versions. it can be any string you want, but should be unique in a custom item type
+          name: 'name-text-shape',
+          capture: false
         });
 
         return container;
@@ -102,49 +144,6 @@ export default {
         }
         graph.setAutoPaint(true);
       },
-    };
-
-    G6.registerNode('card-node', {
-      draw: (cfg, group) => {
-        const config = getNodeConfig(cfg);
-        /* the biggest rect */
-        const container = nodeBasicMethod.createNodeBox(group, config, 243, 64);
-        
-        group.addShape('image', {
-          attrs: {
-            x: 20,
-            y: 13,
-            height: 12,
-            width: 10,
-            img: 'https://os.alipayobjects.com/rmsportal/DFhnQEhHyPjSGYW.png',
-            cursor: 'pointer',
-            opacity: 0,
-          },
-          // must be assigned in G6 3.3 and later versions. it can be any string you want, but should be unique in a custom item type
-          name: 'ip-cp-icon',
-        });
-
-        /* name */
-        group.addShape('text', {
-          attrs: {
-            text: cfg.name,
-            x: 120,
-            y: 32,
-            fontSize: 14,
-            fontWeight: 700,
-            textAlign: 'center',
-            textBaseline: 'middle',
-            fill: config.fontColor,
-          },
-          // must be assigned in G6 3.3 and later versions. it can be any string you want, but should be unique in a custom item type
-          name: 'name-text-shape',
-          capture: false
-        });
-
-        return container;
-      },
-      afterDraw: nodeBasicMethod.afterDraw,
-      setState: nodeBasicMethod.setState,
     });
 
     const container = document.getElementById('app');
@@ -154,13 +153,45 @@ export default {
       container: container,
       width,
       height,
-      // translate the graph to align the canvas's center, support by v3.5.1
-      // fitCenter: true,
       modes: {
-        default: ['drag-node'],
+        default: [
+          {
+            type: 'scroll-canvas',
+            direction: 'y',
+            scalableRange: -200,
+            allowDragOnItem: true,
+          },
+        ],
+      },
+      layout: {
+        type: 'dagre',
+        rankdir: 'LR',
+        align: 'UL',
+        controlPoints: true,
+        nodesep: 10, // 可选
+        ranksep: 100, // 可选
+        // nodesepFunc: () => 1,
+        // ranksepFunc: () => 1,
       },
       defaultNode: {
         type: 'card-node',
+        size: [250, 50],
+        anchorPoints: [
+          [1, 0.5],
+          [0, 0.5],
+        ],
+      },
+      defaultEdge: {
+        type: 'cubic-horizontal',
+        size: 8,
+        color: 'l(0) 0:#ffffff 0.5:#7ec2f3 1:#1890ff',
+        style: {
+          // endArrow: {
+          //   path: 'M 0,0 L 8,4 L 8,-4 Z',
+          //   fill: '#e2e2e2',
+          // },
+          radius: 20,
+        }
       },
     });
 
@@ -168,29 +199,37 @@ export default {
       nodes: [
         {
           id: 'a',
-          name: 'cardNodeApp',
-          x: 0,
-          y: 50,
+          name: 'cardNodeAppa',
         },
         {
           id: 'b',
-          name: 'cardNodeApp',
-          x: 300,
-          y: 50,
+          name: 'cardNodeAppb',
         },
         {
           id: 'c',
-          name: 'cardNodeApp',
-          x: 600,
-          y: 50,
-          children: [
-            {
-              name: 'sub',
-            },
-          ],
+          name: 'cardNodeAppc',
         },
+        {
+          id: 'd',
+          name: 'cardNodeAppd',
+        }
       ],
-      edges: [],
+      edges: [
+        {
+          source: 'a',
+          target: 'b',
+          color: 'l(0) 0:#ffffff 0.5:#7ec2f3 1:#1890ff',
+        },
+        {
+          source: 'b',
+          target: 'c',
+          color: 'l(0) 0:#ffffff 0.5:#7ec2f3 1:#1890ff',
+        },
+        {
+          source: 'a',
+          target: 'd'
+        }
+      ],
     };
 
     graph.data(data);
